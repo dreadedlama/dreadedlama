@@ -285,7 +285,7 @@ The response provides an array of daily totals, each containing EB (Grid), DG, a
 <h2>Integration Architecture</h2>
 
 <p>
-With the API understood and the data logic mapped, converting the prototype into a proper Home Assistant integration became the final step. I implemented Config Flows for easy setup and an <code>ELMeasureCoordinator</code> to manage periodic polling across the endpoints.
+With the API understood and the data logic mapped, converting the prototype into a proper Home Assistant integration became the final step. I implemented Config Flows for easy setup and an <code>ElmeasureCoordinator</code> to manage periodic polling across the endpoints.
 </p>
 
 <pre>
@@ -303,7 +303,7 @@ With the API understood and the data logic mapped, converting the prototype into
                     Authentication
                            │
                            ▼
-                  ELMeasureCoordinator
+                  ElmeasureCoordinator
                            │
         ┌──────────────────┼──────────────────┐
         │                  │                  │
@@ -354,7 +354,7 @@ The integration now exposes everything I originally wanted natively inside Home 
 <h2>Open Source</h2>
 
 <p>
-I decided to open source the integration so anyone using ELMeasure can bring the same data into Home Assistant without repeating the reverse engineering work.
+I decided to open source the integration so anyone using Elmeasure can bring the same data into Home Assistant without repeating the reverse engineering work.
 </p>
 
 <a class="button" href="https://github.com/dreadedlama/elmeasure" target="_blank" rel="noopener">View the Project on GitHub</a>
