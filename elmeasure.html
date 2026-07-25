@@ -233,7 +233,7 @@ Static code analysis only tells part of the story, so I captured live network tr
 The login request wasn't transmitted as plain JSON. The application builds a JSON payload, encrypts it using AES, encodes the encrypted bytes, and only then sends it to the server. 
 </p>
 <p>
-Once I understood this, I reproduced it in a standalone Python client. I discovered the login response returns significantly more than just an <code>AuthToken</code>—it also returns <code>FlatId</code>, <code>UserID</code>, <code>UserName</code>, <code>FlatName</code>, and more. The token is then used for every future request.
+Once I understood this, I reproduced it in a standalone Python client. I discovered the login response returns significantly more than just an <code>AuthToken</code> it also returns <code>FlatId</code>, <code>UserID</code>, <code>UserName</code>, <code>FlatName</code>, and more. The token is then used for every future request.
 </p>
 <img src="images/Python-Response.png" alt="Home Assistant Elmeasure Dashboard showing live power and balance" class="content-image" loading="lazy">
 </div>
@@ -255,8 +255,8 @@ One interesting observation from the <code>GetLiveUpdates</code> endpoint is tha
 To make dashboarding easier in Home Assistant, the integration uses this logic to split the data into dedicated sensors:
 </p>
 <ul>
-<li>If <code>Supply == Grid</code> ➔ Route value to <strong>Grid Current Power</strong></li>
-<li>If <code>Supply == DG</code> ➔ Route value to <strong>DG Current Power</strong></li>
+<li>If <code>Supply == 0</code> ➔ Route value to <strong>Grid Current Power</strong></li>
+<li>If <code>Supply == 1</code> ➔ Route value to <strong>DG Current Power</strong></li>
 </ul>
 </div>
 
@@ -291,11 +291,11 @@ With the API understood and the data logic mapped, converting the prototype into
 <pre>
                     Home Assistant
                            │
-                    Config Flow
+                      Config Flow
                            │
-                    Username
-                    Password
-                    API URL
+                        Username
+                        Password
+                        API URL
                            │
                            ▼
                     Login Request
@@ -339,7 +339,7 @@ The integration now exposes everything I originally wanted natively inside Home 
 </ul>
 </div>
 
-<h2>What I Learned</h2>
+<h2>Learnings</h2>
 
 <div class="card">
 <ul>
