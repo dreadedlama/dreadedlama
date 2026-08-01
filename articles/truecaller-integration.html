@@ -65,15 +65,14 @@ th {background: #18181B; color: #fff; font-family:Inter,sans-serif;}
 .image-row {
     display: flex;
     flex-direction: row;
-    justify-content: center;
     gap: 16px;
     margin: 24px 0;
     width: 100%;
 }
 
 .image-row .content-image {
-    flex: 0 0 40%;
-    max-width: 40%;
+    flex: 0 0 60%;
+    max-width: 60%;
     height: auto;
     margin: 0;
 }
@@ -167,8 +166,8 @@ h1{font-size:2.4rem}
     gap: 8px;
 }
 .image-row .content-image {
-    flex: 0 0 45%;
-    max-width: 45%;
+    flex: 0 0 60%;
+    max-width: 60%;
 }
 }
 </style>
@@ -267,7 +266,7 @@ Instead of trying to reinvent the entire phone dialer from scratch, I decided to
 I decompiled network structures, reverse-engineered token headers, and patched the Truecaller API call directly into Simple Dialer's native Android call listener. Suddenly, it worked seamlessly: when an unknown call arrived, the app pulled caller data dynamically right onto the ringing screen.
 </p>
 <div class="image-row">
-    <img src="../images/truecaller-integration/call_screen.png" alt="Simple Dialer Call Screen with Truecaller Integration" class="content-image" loading="lazy">
+  <img src="../images/truecaller-integration/call_screen.png" alt="Simple Dialer Call Screen with Truecaller Integration" class="content-image" loading="lazy">
 </div>
 </div>
 
