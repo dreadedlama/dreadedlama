@@ -149,7 +149,7 @@ display:flex;
 <nav>
 <div class="navbar">
 
-<a href="elmeasure.html" class="logo">
+<a href="../index.html" class="logo">
 <strong>Pushpender Yadav</strong>
 <span>DreadedLama</span>
 </a>
@@ -157,8 +157,8 @@ display:flex;
 <button class="menu-toggle" aria-label="Menu">&#9776;</button>
 
 <ul class="nav-links">
-    <li><a href="elmeasure.html">Home</a></li>
-    <li><a href="about.html">About</a></li>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../about.html">About</a></li>
     <li><a href="https://github.com/dreadedlama" target="_blank" rel="noopener">GitHub</a></li>
 </ul>
 
@@ -171,6 +171,7 @@ display:flex;
 <p class="subtitle">
 Reverse engineering a private Android API so I could finally see my prepaid electricity data inside Home Assistant.
 </p>
+<p class="hero-meta">Published on <time datetime="2026-07-26">26 July 2026</time></p>
 
 <div class="badges">
 <span class="badge">Home Assistant</span>
@@ -191,7 +192,7 @@ Reverse engineering a private Android API so I could finally see my prepaid elec
 <p>
 After moving into a new apartment, I found that all my electricity information was only available through the <strong>ElNetPPS v3</strong> app (and <strong>MyGate</strong>). Since the apartments in my community use <strong>Elmeasure smart meters</strong>, I could check my prepaid balance, live power consumption, and daily energy usage, but only by opening those apps.
 </p>
-<img src="images/Elmeasure.jpg" alt="Elmeasure Smart Meter" class="content-image" loading="lazy">
+<img src="images/elmeasure/Elmeasure.jpg" alt="Elmeasure Smart Meter" class="content-image" loading="lazy">
 <p>
 I already use <strong>Home Assistant</strong> as the central dashboard for my smart home, bringing together everything from lights and sensors to cameras and automations. Having to open a separate app just to check my electricity usage felt out of place, so I decided to bring that data into Home Assistant alongside everything else.
 </p>
@@ -251,7 +252,7 @@ While browsing the decompiled code, I identified all the API calls. The applicat
 <p>
 Static code analysis only tells part of the story, so I captured live network traffic using <strong>PCAPdroid</strong>. The capture was used to verify the request URLs, HTTP headers, Content-Type, Authorization header, payload format, and server responses. This confirmed my reconstructed requests matched the app's real behavior.
 </p>
-<img src="images/PCAPDroid.jpg" alt="Packet capture of the Android app using PCAPdroid" class="content-image" loading="lazy">
+<img src="images/elmeasure/PCAPDroid.jpg" alt="Packet capture of the Android app using PCAPdroid" class="content-image" loading="lazy">
 </div>
 
 <div class="step">
@@ -262,7 +263,7 @@ The login request wasn't transmitted as plain JSON. The application builds a JSO
 <p>
 Once I understood this, I reproduced it in a standalone Python client. I discovered the login response returns significantly more than just an <code>AuthToken</code> it also returns <code>FlatId</code>, <code>UserID</code>, <code>UserName</code>, <code>FlatName</code>, and more. The token is then used for every future request.
 </p>
-<img src="images/Python-Response.png" alt="Home Assistant Elmeasure Dashboard showing live power and balance" class="content-image" loading="lazy">
+<img src="images/elmeasure/Python-Response.png" alt="Home Assistant Elmeasure Dashboard showing live power and balance" class="content-image" loading="lazy">
 </div>
 
 </div>
@@ -350,7 +351,7 @@ GetDashboardDetails  GetLiveUpdates  GetEnergyDashboard
 <p>
 The integration now exposes everything I originally wanted natively inside Home Assistant, without requiring the official Android application.
 </p>
-<img src="images/HA-Entities.png" alt="Home Assistant Entities created from Elmeasure Integration" class="content-image" loading="lazy">
+<img src="images/elmeasure/HA-Entities.png" alt="Home Assistant Entities created from Elmeasure Integration" class="content-image" loading="lazy">
 
 <div class="card">
 <h3>Supported Features</h3>

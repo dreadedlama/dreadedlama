@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Dialer Supports Truecaller Integration | dreadedlama</title>
+<meta name="description" content="Reverse engineering the Truecaller API and integrating caller identification into an open-source Android dialer while eliminating background tracking and contact syncing.">
+<meta property="article:published_time" content="2023-03-12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,sans-serif;background:#09090B;color:#F5F5F5;line-height:1.8}
+header{padding:80px 8%;background:linear-gradient(180deg,#111827,#09090B)}
+.container{max-width:950px;margin:auto;padding:0 24px}
+main{max-width:950px;margin:auto;padding:60px 24px}
+h1{font-size:3.2rem;line-height:1.1;margin-bottom:16px}
+h2{margin:60px 0 18px;font-size:2rem}
+h3{margin-bottom:8px}
+p,li{color:#d4d4d8}
+p {margin-bottom: 16px;}
+.subtitle{color:#a1a1aa;font-size:1.2rem;max-width:720px}
+.hero-meta{color:#a1a1aa;font-size:0.95rem;margin-top:12px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0}
+.badge{background:#18181B;border:1px solid #303030;padding:8px 14px;border-radius:999px;font-size:0.9rem;}
+.card{background:#18181B;border:1px solid #2d2d2d;border-radius:16px;padding:22px;margin:20px 0}
+.timeline{border-left:2px solid #333;padding-left:24px;margin-top: 30px;}
+.step{margin-bottom:40px; position: relative;}
+.step::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: #38BDF8;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+pre{background:#0d1117;padding:16px 20px;border-radius:12px;font-family:"JetBrains Mono",monospace;overflow:auto; border:1px solid #2d2d2d; margin:16px 0;}
+.card pre {margin: 16px 0; font-size: 0.9rem;}
+.button{display:inline-block;background:#38BDF8;color:#000;text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:700;margin-top:18px; transition: transform 0.2s, background 0.2s;}
+.button:hover{background:#7dd3fc; transform: translateY(-2px);}
+a{color:#38BDF8;text-decoration:none}
+a:hover{text-decoration:underline}
+footer{text-align:center;color:#888;border-top:1px solid #222;padding:30px;margin-top:70px}
+ul{padding-left:22px; margin-bottom: 16px;}
+table {width: 100%; border-collapse: collapse; margin-top: 16px; background: #111; border-radius: 8px; overflow: hidden; font-family:"JetBrains Mono",monospace; font-size: 0.9rem;}
+th, td {padding: 12px 16px; text-align: left; border-bottom: 1px solid #222;}
+th {background: #18181B; color: #fff; font-family:Inter,sans-serif;}
+
+/* ---------- IMAGES ---------- */
+.content-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #333;
+    margin: 24px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: block;
+}
+
+/* Unified Image Grid (Handles both single and side-by-side images) */
+.image-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    margin: 24px 0;
+    width: 100%;
+}
+
+.image-row .content-image {
+    flex: 0 0 40%;
+    max-width: 40%;
+    height: auto;
+    margin: 0;
+}
+
+/* ---------- NAVBAR ---------- */
+nav{
+position:sticky;
+top:0;
+z-index:100;
+background:rgba(9,9,11,.85);
+backdrop-filter:blur(16px);
+border-bottom:1px solid #222;
+}
+
+.navbar{
+max-width:1200px;
+margin:auto;
+padding:18px 24px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+display:flex;
+flex-direction:column;
+text-decoration:none;
+color:#fff;
+}
+
+.logo strong{
+font-size:18px;
+}
+
+.logo span{
+font-size:12px;
+color:#a1a1aa;
+letter-spacing:2px;
+text-transform:uppercase;
+margin-top:2px;
+}
+
+.nav-links{
+display:flex;
+gap:28px;
+list-style:none;
+margin-bottom: 0;
+}
+
+.nav-links a{
+text-decoration:none;
+color:#a1a1aa;
+transition:.25s;
+}
+
+.nav-links a:hover{
+color:#38BDF8;
+}
+
+/* Mobile menu & responsive layout */
+.menu-toggle{
+display:none;
+background:none;
+border:none;
+color:#fff;
+font-size:28px;
+cursor:pointer;
+}
+
+@media(max-width:850px){
+.menu-toggle{
+display:block;
+}
+.navbar{
+flex-wrap:wrap;
+}
+.nav-links{
+display:none;
+flex-direction:column;
+width:100%;
+padding-top:16px;
+gap:16px;
+}
+.nav-links.show{
+display:flex;
+}
+h1{font-size:2.4rem}
+
+/* Make sure all image rows scale beautifully on mobile while staying side-by-side */
+.image-row {
+    gap: 8px;
+}
+.image-row .content-image {
+    flex: 0 0 45%;
+    max-width: 45%;
+}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="navbar">
+<a href="../index.html" class="logo">
+<strong>Pushpender Yadav</strong>
+<span>DreadedLama</span>
+</a>
+
+<button class="menu-toggle" aria-label="Menu">&#9776;</button>
+
+<ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="https://github.com/dreadedlama" target="_blank" rel="noopener">GitHub</a></li>
+</ul>
+</div>
+</nav>
+
+<header>
+<div class="container">
+<h1>Your Dialer Supports<br>Truecaller Integration</h1>
+<p class="subtitle">
+Reverse engineering the Truecaller API to integrate caller identification into an open-source Android dialer, getting accurate caller ID without sacrificing personal data.
+</p>
+<p class="hero-meta">Originally published on <time datetime="2023-03-12">12 March 2023</time></p>
+
+<div class="badges">
+<span class="badge">Android</span>
+<span class="badge">Reverse Engineering</span>
+<span class="badge">Truecaller API</span>
+<span class="badge">Privacy</span>
+<span class="badge">Open Source</span>
+</div>
+
+<a class="button" href="https://github.com/DreadedLama/Simple-Dialer" target="_blank" rel="noopener">⭐ View on GitHub</a>
+</div>
+</header>
+
+<main>
+
+<h2>The Privacy Dilemma</h2>
+<p>
+Around two years ago, I decided I had enough of Truecaller. While the service is undoubtedly the undisputed Goliath of caller identification, keeping their official app on my phone meant handing over full access to my contact list, SMS inbox, call logs, and continuous background activity.
+</p>
+<p>
+I spent weeks testing existing FOSS alternatives, but let's be honest: none possessed a caller database anywhere near as comprehensive as Truecaller's. I was caught between two bad options: give up privacy entirely, or navigate unknown calls blind.
+</p>
+<p>
+That's when I realized a core distinction: <strong> caller lookup is just an API call</strong>. If I could query the Truecaller endpoint on demand whenever an unknown number rang, Truecaller would only see a single number lookup. They wouldn't know who was calling me, how long the call lasted, or have access to my address book.
+</p>
+
+<div class="card">
+<h3>Core Objectives</h3>
+<ul>
+<li>Achieve real-time caller ID on unknown incoming calls.</li>
+<li>Query Truecaller purely on a request basis without continuous background data collection.</li>
+<li>Prevent background syncing of contacts, messages, and call histories.</li>
+<li>Embed the solution seamlessly into an open-source Android dialer interface.</li>
+</ul>
+</div>
+
+<h2>The Journey & Engineering Struggles</h2>
+<p>
+Turning this idea into reality took nearly two years of trial, error, abandoned side-projects, and community collaboration.
+</p>
+
+<div class="timeline">
+
+<div class="step">
+<h3>📱 The Initial Flutter Prototype (BaseCaller)</h3>
+<p>
+I kicked off the experiment by building a Flutter proof-of-concept application aptly named <strong>BaseCaller</strong>. Getting the API requests working in Flutter was a quick win; queries returned accurate names immediately!
+</p>
+<p>
+However, my lack of deep native Android experience quickly caught up with me. I struggled immensely trying to render a native draw-over-apps incoming call overlay (`System Alert Window`) in Flutter. Without a real-time overlay floating over incoming call screens, BaseCaller was reduced to a manual search tool rather than an active caller ID solution. Frustrated, I shelved the project.
+</p>
+<pre>https://github.com/DreadedLama/BaseCaller</pre>
+
+<div class="image-row">
+    <img src="images/truecaller-integration/BaseCaller_1.png" alt="BaseCaller App Screenshot 1" class="content-image" loading="lazy">
+    <img src="images/truecaller-integration/BaseCaller_2.png" alt="BaseCaller App Screenshot 2" class="content-image" loading="lazy">
+</div>
+</div>
+
+<div class="step">
+<h3>🔧 Forking Simple Dialer</h3>
+<p>
+Instead of trying to reinvent the entire phone dialer from scratch, I decided to leverage an existing FOSS giant: <strong>Simple Dialer</strong> (created by Tibor Kaputa). 
+</p>
+<p>
+I decompiled network structures, reverse-engineered token headers, and patched the Truecaller API call directly into Simple Dialer's native Android call listener. Suddenly, it worked seamlessly: when an unknown call arrived, the app pulled caller data dynamically right onto the ringing screen.
+</p>
+<div class="image-row">
+    <img src="images/truecaller-integration/call_screen.png" alt="Simple Dialer Call Screen with Truecaller Integration" class="content-image" loading="lazy">
+</div>
+</div>
+
+<div class="step">
+<h3>💬 The Reddit Tasker Pivot & Project Pause</h3>
+<p>
+I shared my technical approach on Reddit. A user (<a href="https://www.reddit.com/r/fossdroid/comments/uxc63k/comment/i9zbmgh" target="_blank" rel="noopener">anuraag488</a>) took my reverse-engineered endpoint findings and crafted a brilliant Tasker profile to handle the workflow automatically.
+</p>
+<p>
+Since using Tasker required zero app maintenance on my end, I parked my Simple Dialer fork and used the Tasker profile for over a year and a half. 
+</p>
+</div>
+
+<div class="step">
+<h3>🚀 Resurrecting the Fork & In-App Search</h3>
+<p>
+After 1.5 years, a community member reached out asking if I could update my Simple Dialer fork to match the latest upstream codebase. 
+</p>
+<p>
+With some free time on my hands, I pulled down the massive upstream updates, resolved merge conflicts, and decided I wasn't putting the code away until I built the missing feature I originally wanted: full in-app number searching directly inside the dialer search bar.
+</p>
+</div>
+
+</div>
+
+<h2>The Final Result</h2>
+<p>
+The resulting fork fetches a caller's full name, profile picture, location city, and telecom carrier information dynamically, using only a lightweight Truecaller authentication token.
+</p>
+
+<div class="image-row">
+    <img src="images/truecaller-integration/truecaller_number_info_1.png" alt="In-app Truecaller search result example 1" class="content-image" loading="lazy">
+    <img src="images/truecaller-integration/truecaller_number_info_2.png" alt="In-app Truecaller search result example 2" class="content-image" loading="lazy">
+</div>
+
+<div class="card">
+<h3>Key Features</h3>
+<ul>
+<li><strong>Live Caller Identification:</strong> Detects unknown incoming callers in real time.</li>
+<li><strong>Integrated Number Search:</strong> Look up any number directly from the dialer search bar.</li>
+<li><strong>Rich Details:</strong> Displays caller name, avatar image, city, and carrier info.</li>
+<li><strong>Clean Upstream Sync:</strong> Built on top of the modern, minimalist Simple Dialer codebase.</li>
+<li><strong>100% Open Source:</strong> Full transparency with zero telemetry or hidden telemetry hooks.</li>
+</ul>
+</div>
+
+<h2>Authentication & Privacy Strategy</h2>
+<p>
+To query Truecaller's API, the dialer requires a valid authentication token. Obtaining this token requires a one-time verification.
+</p>
+
+<div class="card">
+<h3>🔒 The One-Time Setup Privacy Trick</h3>
+<p>
+To get your auth token, you must temporarily install the official Truecaller app to complete SMS/OTP registration. 
+</p>
+<p>
+To completely neuter Truecaller's data collection during this brief setup:
+</p>
+<ol style="padding-left: 22px; color: #d4d4d8;">
+    <li style="margin-bottom: 8px;">Install a permission manager like <strong>App Manager</strong> (FOSS) or Rikka's <strong>App Ops</strong> (using Shizuku).</li>
+    <li style="margin-bottom: 8px;">Revoke/Disable all App Ops permissions (Contacts, SMS, Phone, Call Logs, Storage) before launching Truecaller.</li>
+    <li style="margin-bottom: 8px;">Log in, extract your installation token following the guide in my GitHub README, and immediately uninstall Truecaller forever!</li>
+</ol>
+</div>
+
+<h2>Resources</h2>
+<div class="card">
+<ul>
+<li>Simple Dialer Fork - <a href="https://github.com/DreadedLama/Simple-Dialer" target="_blank" rel="noopener">GitHub Repository</a></li>
+<li>BaseCaller Prototype - <a href="https://github.com/DreadedLama/BaseCaller" target="_blank" rel="noopener">GitHub Repository</a></li>
+<li>Reddit Discussion - <a href="https://www.reddit.com/r/fossdroid/comments/uxc63k/comment/i9zbmgh" target="_blank" rel="noopener">Reddit Thread</a></li>
+<li>Original Medium Article - <a href="https://medium.com/@pushpenderyadav145/your-dialer-supports-truecaller-integration-d44356fabb3f" target="_blank" rel="noopener">Medium Post</a></li>
+</ul>
+</div>
+
+</main>
+
+<footer>
+Built with curiosity, persistence, and a passion for open-source privacy.<br>
+© 2026 dreadedlama
+</footer>
+
+<script>
+const toggle=document.querySelector('.menu-toggle');
+const nav=document.querySelector('.nav-links');
+toggle.addEventListener('click',()=>nav.classList.toggle('show'));
+</script>
+
+</body>
+</html>
