@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Band Now Supports Smart Replies | dreadedlama</title>
+<meta name="description" content="A Tasker plugin utilizing Google's ML Kit to generate on-device smart replies for the Mi Band.">
+<meta property="article:published_time" content="2021-06-24">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,sans-serif;background:#09090B;color:#F5F5F5;line-height:1.8}
+header{padding:80px 8%;background:linear-gradient(180deg,#111827,#09090B)}
+.container{max-width:950px;margin:auto;padding:0 24px}
+main{max-width:950px;margin:auto;padding:60px 24px}
+h1{font-size:3.2rem;line-height:1.1;margin-bottom:16px}
+h2{margin:60px 0 18px;font-size:2rem}
+h3{margin:36px 0 12px;font-size:1.4rem}
+p,li{color:#d4d4d8}
+p {margin-bottom: 16px;}
+.subtitle{color:#a1a1aa;font-size:1.2rem;max-width:720px}
+.hero-meta{color:#a1a1aa;font-size:0.95rem;margin-top:12px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0}
+.badge{background:#18181B;border:1px solid #303030;padding:8px 14px;border-radius:999px;font-size:0.9rem;}
+.card{background:#18181B;border:1px solid #2d2d2d;border-radius:16px;padding:22px;margin:20px 0}
+.timeline{border-left:2px solid #333;padding-left:24px;margin-top: 30px;}
+.step{margin-bottom:40px; position: relative;}
+.step::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: #38BDF8;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+.button{display:inline-block;background:#38BDF8;color:#000;text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:700;margin-top:18px; transition: transform 0.2s, background 0.2s;}
+.button:hover{background:#7dd3fc; transform: translateY(-2px);}
+a{color:#38BDF8;text-decoration:none}
+a:hover{text-decoration:underline}
+footer{text-align:center;color:#888;border-top:1px solid #222;padding:30px;margin-top:70px}
+ul{padding-left:22px; margin-bottom: 16px;}
+
+/* ---------- NAVBAR ---------- */
+nav{
+position:sticky;
+top:0;
+z-index:100;
+background:rgba(9,9,11,.85);
+backdrop-filter:blur(16px);
+border-bottom:1px solid #222;
+}
+
+.navbar{
+max-width:1200px;
+margin:auto;
+padding:18px 24px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+display:flex;
+flex-direction:column;
+text-decoration:none;
+color:#fff;
+}
+
+.logo strong{
+font-size:18px;
+}
+
+.logo span{
+font-size:12px;
+color:#a1a1aa;
+letter-spacing:2px;
+text-transform:uppercase;
+margin-top:2px;
+}
+
+.nav-links{
+display:flex;
+gap:28px;
+list-style:none;
+margin-bottom: 0;
+}
+
+.nav-links a{
+text-decoration:none;
+color:#a1a1aa;
+transition:.25s;
+}
+
+.nav-links a:hover{
+color:#38BDF8;
+}
+
+.menu-toggle{
+display:none;
+background:none;
+border:none;
+color:#fff;
+font-size:28px;
+cursor:pointer;
+}
+
+@media(max-width:850px){
+.menu-toggle{
+display:block;
+}
+.navbar{
+flex-wrap:wrap;
+}
+.nav-links{
+display:none;
+flex-direction:column;
+width:100%;
+padding-top:16px;
+gap:16px;
+}
+.nav-links.show{
+display:flex;
+}
+h1{font-size:2.4rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="navbar">
+<a href="../index.html" class="logo">
+<strong>Pushpender Yadav</strong>
+<span>DreadedLama</span>
+</a>
+
+<button class="menu-toggle" aria-label="Menu">&#9776;</button>
+
+<ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="https://github.com/dreadedlama" target="_blank" rel="noopener">GitHub</a></li>
+</ul>
+</div>
+</nav>
+
+<header>
+<div class="container">
+<h1>Bringing Smart Replies<br>to the Mi Band</h1>
+<p class="subtitle">
+Leveraging Google's ML Kit and Tasker to generate on-device smart replies for any incoming message directly from a fitness tracker.
+</p>
+<p class="hero-meta">Published on <time datetime="2021-06-24">24 June 2021</time></p>
+
+<div class="badges">
+<span class="badge">Tasker Plugin</span>
+<span class="badge">Android</span>
+<span class="badge">ML Kit</span>
+<span class="badge">Mi Band</span>
+<span class="badge">Open Source</span>
+</div>
+
+<a class="button" href="https://github.com/dreadedlama/SmartReply" target="_blank" rel="noopener">⭐ View on GitHub</a>
+</div>
+</header>
+
+<main>
+
+<h2>The Dead End</h2>
+<p>
+A couple of months back, I was deeply invested in automating functions on my Mi Band[cite: 8]. I really wanted to use smart replies to respond to messages right from my wrist[cite: 8]. I quickly realized nothing of the sort had been properly implemented for this specific band[cite: 8]. 
+</p>
+<p>
+Upon reading about how smart replies are generated natively in Android, I hit a massive roadblock[cite: 8]. The suggested replies generated by messaging apps are heavily sandboxed[cite: 8]. They are simply not accessible to third-party applications to intercept and forward to a smartwatch[cite: 8]. It seemed like a dead end[cite: 8].
+</p>
+
+<h2>The On-Device Discovery</h2>
+<p>
+Then I had a realization[cite: 8]. Smart replies are generated locally using on-device machine learning[cite: 8]. If apps like WhatsApp can call the API to generate context-aware replies, I could potentially query that exact same API to generate my own set of suggested replies[cite: 8].
+</p>
+<p>
+I dove into the documentation to understand how these replies are constructed[cite: 8].
+</p>
+<blockquote style="border-left: 4px solid #38BDF8; padding-left: 16px; margin: 16px 0; color: #a1a1aa; font-style: italic;">
+"An app passes a conversation context to the on-device ML Kit to get suggested replies[cite: 8]. The ML Kit uses the conversation to try to find relevant replies to the last message received from the remote user[cite: 8]. If it is successful, it returns a set of 3 smart replies[cite: 8]."
+</blockquote>
+<p>
+My new goal was clear[cite: 8]. I needed to build a custom Android application that could take a single message string, feed it to Google's ML Kit, and return the three smart replies as a usable variable[cite: 8]. Because I would not have access to the user's entire conversation history, I decided to simplify the process and feed it only the very last received message[cite: 8].
+</p>
+
+<h2>Building My First Android App</h2>
+<p>
+I wanted this tool to integrate perfectly with Tasker[cite: 8]. This meant I had to build an official Tasker Plugin[cite: 8]. Having never created an Android application from scratch before, this was a huge learning curve[cite: 8].
+</p>
+<p>
+After countless hours reading through documentation, studying the ML Kit demo code provided by Google on their GitHub, and dissecting the sample code for creating Tasker plugins by João Dias, I finally got it working[cite: 8]. 
+</p>
+<p>
+The result is <strong>"Smart Reply"</strong>, a standalone Tasker Plugin that takes a string as input, processes it through ML Kit, and outputs the suggested replies[cite: 8]. It saves the output as a string in the <code>%reply</code> variable with each suggestion on a new line[cite: 8]. If the ML Kit is unable to generate a response, the plugin smartly falls back and sets the variable to "No smart replies found"[cite: 8].
+</p>
+
+<h2>The Automation Flow</h2>
+<p>
+Once the plugin was built, I had to stitch the whole ecosystem together using a combination of apps[cite: 8]. I used Tasker, AutoNotification, Notify for Mi Band, and my new Smart Reply plugin[cite: 8].
+</p>
+
+<div class="timeline">
+
+<div class="step">
+<h3>1. Interception</h3>
+<p>
+I use <strong>AutoNotification</strong> to intercept incoming notifications from any messaging app and save the actual message content into a Tasker variable[cite: 8].
+</p>
+</div>
+
+<div class="step">
+<h3>2. Triggering</h3>
+<p>
+Once I receive a message, I use the <strong>Notify</strong> app to capture media control button clicks from the Mi Band[cite: 8]. These clicks are broadcasted as intents into Tasker[cite: 8]. For example, pressing the volume increase button on the band triggers the smart reply task[cite: 8].
+</p>
+</div>
+
+<div class="step">
+<h3>3. Generation</h3>
+<p>
+Inside Tasker, once the intent is received, I pass the saved message content directly into my <strong>Smart Reply</strong> plugin[cite: 8]. The plugin then queries ML Kit[cite: 8].
+</p>
+</div>
+
+<div class="step">
+<h3>4. Delivery & Selection</h3>
+<p>
+The plugin returns the replies as an array with a newline character as a delimiter[cite: 8]. These replies are sent back to my Mi Band as a custom notification[cite: 8]. I then map the media buttons on the band to select the desired response[cite: 8]. The Play button selects the first reply, the Previous button selects the second, and the Next button selects the third[cite: 8].
+</p>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Fallback System (Quick Replies)</h3>
+<p>
+In the event that the plugin does not find any suitable smart replies, I built a fallback mechanism[cite: 8]. We can reply to the message from a hardcoded default list of messages like "Yes", "No", and "Ok"[cite: 8]. This works similarly to the native Quick Reply feature of the Notify app[cite: 8].
+</p>
+</div>
+
+<h2>The Final Outcome</h2>
+<p>
+It was an incredible feeling to bridge on-device machine learning with raw Tasker automation[cite: 8]. While the replies might not be perfectly context-aware like native apps since I only analyze the very last message instead of the whole thread, it works brilliantly for quickly firing off responses directly from my wrist[cite: 8].
+</p>
+
+<h3>Action Video</h3>
+<p>You can watch a quick demo of the smart replies in action on YouTube[cite: 8]:</p>
+<a class="button" href="https://youtube.com/shorts/w-7oBad_i3k?feature=share" target="_blank" rel="noopener">▶️ Watch Demo on YouTube</a>
+
+<h2>Getting Started</h2>
+<div class="card">
+<ul>
+<li>In your Tasker task, choose the plugin option and select <strong>"Reply"</strong>[cite: 8].</li>
+<li>Input the message variable to get suggested smart replies[cite: 8].</li>
+<li>The output is saved in the <code>%reply</code> variable as a string with each suggestion on a new line[cite: 8].</li>
+<li>If you want to view the full automation setup, you can import my <a href="#" target="_blank" rel="noopener">Smart Reply Tasker Project</a>[cite: 8].</li>
+</ul>
+</div>
+
+<h2>Credits & Resources</h2>
+<p>
+A huge thanks to Google's open-source ML Kit examples and João Dias for providing the framework for Tasker plugins[cite: 8].
+</p>
+
+<a class="button" href="https://github.com/dreadedlama/SmartReply" target="_blank" rel="noopener">View Repository & Download Plugin</a>
+
+</main>
+
+<footer>
+Built with curiosity, persistence, and a passion for open-source automation[cite: 8].<br>
+© 2026 dreadedlama[cite: 8]
+</footer>
+
+<script>
+const toggle=document.querySelector('.menu-toggle');
+const nav=document.querySelector('.nav-links');
+toggle.addEventListener('click',()=>nav.classList.toggle('show'));
+</script>
+
+</body>
+</html>
