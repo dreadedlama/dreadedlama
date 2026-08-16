@@ -370,6 +370,22 @@ The final coding piece was setting up a custom webhook endpoint inside Home Assi
 <p>
 When the request lands, Home Assistant rips open the form body, pulls out the <code>jsonData</code> string, grabs the serial number and hardware ID, and maps all those numeric sensor keys into nice, clean entities.
 </p>
+
+<p>
+There was one detail here that genuinely surprised me. The "serial number" wasn't really a secret device identifier at all. It was simply the meter's <strong>MAC address</strong>, represented as the serial number used by the API.
+</p>
+
+<p>
+For example, using the <strong>sample MAC address</strong> <code>A1B2C3D4E5F6</code>, the API would represent it as the serial number <code>A1B2C3D4E5F6</code>. So whenever I refer to the meter's serial number below, I mean this MAC-based identifier.
+</p>
+
+<p>
+For example, a device with a MAC address such as <code>A1B2C3D4E5F6</code> could effectively use that value as its serial number when submitting data. The serial number appeared to be the only thing needed to associate a submission with a device; there was no additional authentication or device-specific credential involved in the request.
+</p>
+
+<p>
+That means the serial number isn't just an identifier. In practice, it acts as the key that tells the server where the submitted data should go.
+</p>
 </div>
 
 </div>
@@ -469,7 +485,7 @@ AQI Meter -> HA ──┼── Use in automations
 <h2>Optional Cloud Forwarding</h2>
 
 <p>
-If you still want your data feeding into the official app or another external dashboard, you don't have to lose it. Home Assistant can push it right back out using a simple REST command:
+If you still want your data feeding into the official website, you don't have to lose it. Home Assistant can push it right back out using a simple REST command:
 </p>
 <pre>
 rest_command:
@@ -506,6 +522,22 @@ The physical box still does its job, but the data hits my local network first. I
 <br>The important part is having a choice. Your home telemetry should live in your home unless you explicitly decide to share it elsewhere.
 </div>
 
+<p>
+And there was a second privacy concern I hadn't expected to find. Since this identifier is simply the device's MAC address, something as simple as the <strong>sample value</strong> <code>A1B2C3D4E5F6</code> is enough to associate submitted data with that meter.
+</p>
+
+<p>
+Once I understood that, the trust model became even more interesting. A MAC address is an identifier, not a secret credential, and it can sometimes be observed from network traffic or other device information.
+</p>
+
+<p>
+So if someone discovered another meter's MAC address, they could potentially use it as the serial number when submitting data and inject fabricated readings into that device's dashboard. They would not gain control of the physical meter, but they could potentially compromise the integrity of the data associated with it.
+</p>
+
+<p>
+I was honestly surprised by how simple that trust model was. There was no password, token, or stronger proof that the sender actually owned the meter  just the device identifier. Even though that doesn't give someone control of the physical meter, it could still undermine the integrity of the data associated with it.
+</p>
+
 <h2>What I Want to Look at Next</h2>
 
 <div class="card">
@@ -532,7 +564,7 @@ That is the next rabbit hole.
 This whole thing started because I wanted to know where my air quality meter was dumping its packets. 
 </p>
 <p>
-The fun part wasn't just finding the URL. It was realizing the device already had an open HTTP interface sitting there, just waiting for someone to point it in the right direction.
+The fun part wasn't just finding the URL. It was realizing the device already had an open HTTP interface sitting there, just waiting for someone to point it in the right direction. And along the way, I found that the cloud side trusted a surprisingly small piece of information  the meter's serial number  which made the privacy and data-integrity implications much more interesting than I initially expected.
 </p>
 
 <a class="button" href="https://github.com/dreadedlama/Prana-Air" target="_blank" rel="noopener">⭐ View on GitHub</a>
