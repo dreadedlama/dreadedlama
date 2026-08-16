@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taking Control of the Prana Air AQI Meter | dreadedlama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,sans-serif;background:#09090B;color:#F5F5F5;line-height:1.8}
+header{padding:80px 8%;background:linear-gradient(180deg,#111827,#09090B)}
+.container{max-width:950px;margin:auto;padding:0 24px}
+main{max-width:950px;margin:auto;padding:60px 24px}
+h1{font-size:3.2rem;line-height:1.1;margin-bottom:16px}
+h2{margin:60px 0 18px;font-size:2rem}
+h3{margin-bottom:8px}
+p,li{color:#d4d4d8}
+p {margin-bottom: 16px;}
+.subtitle{color:#a1a1aa;font-size:1.2rem;max-width:720px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0}
+.badge{background:#18181B;border:1px solid #303030;padding:8px 14px;border-radius:999px;font-size:0.9rem;}
+.card{background:#18181B;border:1px solid #2d2d2d;border-radius:16px;padding:22px;margin:20px 0}
+.timeline{border-left:2px solid #333;padding-left:24px;margin-top: 30px;}
+.step{margin-bottom:40px; position: relative;}
+.step::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: #38BDF8;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+pre{background:#0d1117;padding:20px;border-radius:12px;font-family:"JetBrains Mono",monospace;overflow:auto; border:1px solid #2d2d2d;}
+.card pre {margin: 16px 0; font-size: 0.9rem;}
+.button{display:inline-block;background:#38BDF8;color:#000;text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:700;margin-top:18px; transition: transform 0.2s, background 0.2s;}
+.button:hover{background:#7dd3fc; transform: translateY(-2px);}
+a{color:#38BDF8}
+footer{text-align:center;color:#888;border-top:1px solid #222;padding:30px;margin-top:70px}
+ul{padding-left:22px; margin-bottom: 16px;}
+table {width: 100%; border-collapse: collapse; margin-top: 16px; background: #111; border-radius: 8px; overflow: hidden; font-family:"JetBrains Mono",monospace; font-size: 0.9rem;}
+th, td {padding: 12px 16px; text-align: left; border-bottom: 1px solid #222;}
+th {background: #18181B; color: #fff; font-family:Inter,sans-serif;}
+
+/* ---------- IMAGES ---------- */
+.content-image {
+    max-width: 80%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #333;
+    margin: 24px auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: block;
+}
+/* Make the landscape AQI.in screenshot larger for readability */
+.site-image {
+    max-width: 110%;
+    width: 110%;
+}
+
+/* Unified Image Grid (Handles both single and side-by-side images) */
+.image-row {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    margin: 24px 0;
+    width: 95%;
+}
+
+.image-row .content-image {
+    flex: 0 0 55%;
+    max-width: 55%;
+    height: auto;
+    margin: 0;
+}
+/* ---------- NAVBAR ---------- */
+nav{
+position:sticky;
+top:0;
+z-index:100;
+background:rgba(9,9,11,.85);
+backdrop-filter:blur(16px);
+border-bottom:1px solid #222;
+}
+
+.navbar{
+max-width:1200px;
+margin:auto;
+padding:18px 24px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+display:flex;
+flex-direction:column;
+text-decoration:none;
+color:#fff;
+}
+
+.logo strong{
+font-size:18px;
+}
+
+.logo span{
+font-size:12px;
+color:#a1a1aa;
+letter-spacing:2px;
+text-transform:uppercase;
+margin-top:2px;
+}
+
+.nav-links{
+display:flex;
+gap:28px;
+list-style:none;
+margin-bottom: 0;
+}
+
+.nav-links a{
+text-decoration:none;
+color:#a1a1aa;
+transition:.25s;
+}
+
+.nav-links a:hover{
+color:#38BDF8;
+}
+
+/* Mobile menu */
+.menu-toggle{
+display:none;
+background:none;
+border:none;
+color:#fff;
+font-size:28px;
+cursor:pointer;
+}
+
+@media(max-width:850px){
+.menu-toggle{
+display:block;
+}
+.navbar{
+flex-wrap:wrap;
+}
+.nav-links{
+display:none;
+flex-direction:column;
+width:100%;
+padding-top:16px;
+gap:16px;
+}
+.nav-links.show{
+display:flex;
+}
+/* Make sure all image rows scale beautifully on mobile while staying side-by-side */
+.image-row {
+    gap: 8px;
+}
+.image-row .content-image {
+    flex: 0 0 55%;
+    max-width: 55%;
+}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="navbar">
+<a href="../index.html" class="logo">
+<strong>Pushpender Yadav</strong>
+<span>DreadedLama</span>
+</a>
+<button class="menu-toggle" aria-label="Menu">&#9776;</button>
+<ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="https://github.com/dreadedlama" target="_blank" rel="noopener">GitHub</a></li>
+</ul>
+</div>
+</nav>
+
+<header>
+<div class="container">
+<h1>Taking Control of the Prana Air AQI Meter</h1>
+<p class="subtitle">
+How I figured out what requests my air quality meter was sending, decoded the data, pulled it into Home Assistant, and made cloud uploads optional.
+</p>
+<p class="hero-meta">Published on <time datetime="2026-08-16">16 August 2026</time></p>
+
+<div class="badges">
+<span class="badge">Home Assistant</span>
+<span class="badge">ESP32-C3</span>
+<span class="badge">Reverse Engineering</span>
+<span class="badge">AdGuard Home</span>
+<span class="badge">Nginx</span>
+<span class="badge">Local-first</span>
+</div>
+
+<a class="button" href="https://github.com/dreadedlama/Prana-Air" target="_blank" rel="noopener">⭐ View on GitHub</a>
+</div>
+</header>
+
+<main>
+
+<h2>Why I Did This</h2>
+
+<p>
+I had an AQI.in air quality monitor sitting in my apartment, but it annoyed me that the device completely controlled its own life. It decided where the numbers went and when they got sent out. 
+</p>
+
+<div class="image-row">
+    <img src="../images/prana-air/Prana-Air.jpg" alt="AQI.in air quality monitor" class="content-image" loading="lazy">
+    <img src="../images/prana-air/Pcb.jpg" alt="AQI.in air quality monitor PCB" class="content-image" loading="lazy">
+</div>
+<p>
+By default, the firmware just dumped data straight to a remote server:
+</p>
+<pre>http://data.aqi.in/api/v1/SendSensordata</pre>
+<br>
+<p>
+Normally, viewing your device metrics meant looking through their standard web portal interface:
+</p>
+<img src="../images/prana-air/AQI.png"
+     alt="AQI.in website"
+     class="content-image"
+     loading="lazy">
+
+<img src="../images/prana-air/Site.png"
+     alt="AQI.in website"
+     class="content-image site-image"
+     loading="lazy">
+<p>
+So the default path was essentially:
+</p>
+<pre>AQI Meter -> Internet -> AQI.in</pre>
+<p>
+I wanted it to work like this instead:
+</p>
+<pre>AQI Meter -> My LAN -> Home Assistant -> Wherever I want</pre>
+
+<div class="card">
+<strong>I didn't just want to block the cloud.</strong>
+<br>I wanted Home Assistant to be the boss of the data. That way I could keep things local, run automations when air quality dropped, and only send stuff out to the cloud if I explicitly felt like it.
+</div>
+
+<div class="card">
+<h3>What I wanted to achieve</h3>
+<ul>
+<li>Catch the HTTP data the meter was already shouting out.</li>
+<li>Keep the meter using its normal endpoint so I didn't have to rewrite the firmware.</li>
+<li>Turn those payloads into normal Home Assistant sensors.</li>
+<li>Handle cloud uploads right from Home Assistant.</li>
+<li>Change how it uploads without tearing the device apart or flashing it.</li>
+</ul>
+</div>
+
+<h2>How I Figured It Out</h2>
+
+<p>
+Getting this to work took some trial and error. I didn't magically know what to do on day one. Here is how I chipped away at the problem piece by piece.
+</p>
+
+<div class="timeline">
+
+<div class="step">
+<h3>📦 Step 1: Finding the Meter on My Network</h3>
+<p>
+First, I needed to know where the thing even was. I logged into my router and checked the DHCP leases to see what new hardware had joined recently. Sure enough, an ESP32 chip popped up:
+</p>
+<pre>
+DHCPDISCOVER(br-lan) xx:xx:xx:xx:xx:xx
+DHCPOFFER(br-lan) 192.168.X.XXX
+DHCPREQUEST(br-lan) 192.168.X.XXX
+DHCPACK(br-lan) 192.168.X.XXX AQI-Meter-esp32c3
+</pre>
+<table>
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>Hostname</td><td>AQI-Meter-esp32c3</td></tr>
+<tr><td>IP Subnet</td><td>192.168.X.XXX</td></tr>
+<tr><td>MAC Address</td><td>XX:XX:XX:XX:XX:XX</td></tr>
+<tr><td>Hardware</td><td>ESP32-C3</td></tr>
+</table>
+</div>
+
+<div class="step">
+<h3>☁️ Step 2: Watching Where It Sent Data</h3>
+<p>
+Once I had its IP address, I watched its outbound DNS and traffic requests. It kept trying to talk to one specific address over and over:
+</p>
+<pre>http://data.aqi.in/api/v1/SendSensordata</pre>
+<p>
+Finding that URL was huge. It meant I didn't have to touch the device firmware yet. If I could spoof that domain name locally, I could catch whatever it was trying to send.
+</p>
+</div>
+
+<div class="step">
+<h3>🌐 Step 3: Hijacking the Domain with AdGuard</h3>
+<p>
+Since I already use AdGuard Home on my network for DNS, setting up an intercept was pretty easy. I added a custom local DNS rewrite rule:
+</p>
+<pre>data.aqi.in -> 192.168.X.XXX (Local Server)</pre>
+<p>
+Now, whenever the meter thinks it is calling home to <code>data.aqi.in</code>, AdGuard quietly points it at my local server instead of letting the packet leave the house.
+</p>
+</div>
+
+<div class="step">
+<h3>🔄 Step 4: Fixing Port Mismatches with Nginx</h3>
+<p>
+I hit a quick snag once the traffic arrived at my server. The meter's code assumes it is talking to standard port 80, but my Home Assistant instance hangs out on port 8123. 
+</p>
+<p>
+To smooth that over without breaking anything, I spun up a lightweight Nginx container to act as a translator:
+</p>
+<pre>
+server {
+    listen 80;
+    server_name data.aqi.in;
+
+    location = /api/v1/SendSensordata {
+        proxy_pass http://192.168.X.XXX:8123;
+    }
+
+    location / {
+        return 404;
+    }
+}
+</pre>
+<p>
+Using an exact match on that specific URL means anything else hitting port 80 gets dropped immediately with a 404, keeping things clean.
+</p>
+</div>
+
+<div class="step">
+<h3>📡 Step 5: Looking Inside the Request Body</h3>
+<p>
+With Nginx passing the traffic through, I could finally see what the meter was saying. I checked the logs and found a standard form post:
+</p>
+<pre>
+POST /api/v1/SendSensordata HTTP/1.1
+Host: data.aqi.in
+User-Agent: ESP32HTTPClient
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 185
+</pre>
+<p>
+And tucked inside the body was a neat little JSON package:
+</p>
+<pre>jsonData={"serialNo":"XXXXXXXXXXXX","hwId":69,"data":[[3,19],[11,28.0],[30,82.3],[12,71],[5,13],[4,24],[1,31],[18,0.010],[71,2824],[72,647],[73,118],[74,20],[75,9],[76,5],[13,73]]}</pre>
+<p>
+This was a relief. It wasn't encrypted or locked behind some weird proprietary binary format. It was just plain text form data wrapped around a JSON string.
+</p>
+</div>
+
+<div class="step">
+<h3>🔌 Step 6: Catching It in Home Assistant</h3>
+<p>
+The final coding piece was setting up a custom webhook endpoint inside Home Assistant matching the path:
+</p>
+<pre>/api/v1/SendSensordata</pre>
+<p>
+When the request lands, Home Assistant rips open the form body, pulls out the <code>jsonData</code> string, grabs the serial number and hardware ID, and maps all those numeric sensor keys into nice, clean entities.
+</p>
+</div>
+
+</div>
+
+<h2>Decoding the Numbers</h2>
+
+<p>
+The inner array packs key value pairs where the first number is a sensor ID and the second is the reading. Here is what those IDs actually translate to:
+</p>
+
+<table>
+<tr><th>ID</th><th>Measurement</th></tr>
+<tr><td>1</td><td>AQI</td></tr>
+<tr><td>3</td><td>PM2.5</td></tr>
+<tr><td>4</td><td>PM10</td></tr>
+<tr><td>5</td><td>PM1</td></tr>
+<tr><td>11</td><td>Temperature °C</td></tr>
+<tr><td>30</td><td>Temperature °F</td></tr>
+<tr><td>12</td><td>Humidity</td></tr>
+<tr><td>18</td><td>TVOC</td></tr>
+<tr><td>71</td><td>Particle count 0.3 µm</td></tr>
+<tr><td>72</td><td>Particle count 0.5 µm</td></tr>
+<tr><td>73</td><td>Particle count 1.0 µm</td></tr>
+<tr><td>74</td><td>Particle count 3.0 µm</td></tr>
+<tr><td>75</td><td>Particle count 5.0 µm</td></tr>
+<tr><td>76</td><td>Particle count 10.0 µm</td></tr>
+<tr><td>13</td><td>Noise</td></tr>
+</table>
+
+<p>
+When you parse a live payload, it looks something like this:
+</p>
+<pre>
+[3,18]       -> PM2.5 = 18
+[11,28.1]    -> 28.1 °C
+[30,82.5]    -> 82.5 °F
+[12,71]      -> 71% humidity
+[5,11]       -> PM1 = 11
+[4,21]       -> PM10 = 21
+[1,30]       -> AQI = 30
+[18,0.028]   -> TVOC = 0.028
+[13,52]      -> noise = 52
+</pre>
+
+<h2>The Final Architecture</h2>
+
+<p>With all the moving parts hooked up, the network flow looks like this:</p>
+
+<pre>
+                        LOCAL NETWORK
+┌────────────────────────────────────────────────────────────┐
+│                                                            │
+│  AQI Meter (ESP32-C3)                                      │
+│  192.168.X.XXX                                             │
+│        │                                                   │
+│        │ POST data.aqi.in/api/v1/SendSensordata            │
+│        ▼                                                   │
+│  AdGuard Home                                              │
+│  data.aqi.in -> 192.168.X.XXX                              │
+│        │                                                   │
+│        ▼                                                   │
+│  Nginx (:80)                                               │
+│  only /api/v1/SendSensordata                               │
+│        │                                                   │
+│        ▼                                                   │
+│  Home Assistant (:8123)                                    │
+│  AQI.in custom integration                                 │
+│        │                                                   │
+│        ┌──────────────────────────┐                        │
+│        ▼                          ▼                        │
+│  Local HA sensors        Optional cloud forwarding         │
+└────────────────────────────────────────────────────────────┘
+</pre>
+
+<h2>Who is in Control Now?</h2>
+
+<p>
+Before this, the hardware forced its own update schedule. Now, data stops at my house first:
+</p>
+
+<pre>
+AQI Meter -> AdGuard DNS rewrite -> Nginx -> Home Assistant
+</pre>
+
+<p>
+From there, Home Assistant handles what happens next:
+</p>
+
+<pre>
+                 ┌── Keep locally
+                 │
+AQI Meter -> HA ──┼── Use in automations
+                 │
+                 └── Optional cloud forwarding
+</pre>
+
+<h2>Optional Cloud Forwarding</h2>
+
+<p>
+If you still want your data feeding into the official app or another external dashboard, you don't have to lose it. Home Assistant can push it right back out using a simple REST command:
+</p>
+<pre>
+rest_command:
+  aqi_cloud_forward:
+    url: "http://[EXTERNAL_IP_OR_HOST]/api/v1/SendSensordata"
+    method: POST
+    timeout: 30
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+      Host: "data.aqi.in"
+      User-Agent: "ESP32HTTPClient"
+</pre>
+
+<h2>The End Result</h2>
+
+<p>
+The meter shows up right inside Home Assistant now as a proper device with real entities, completely ignoring the public internet for its core functions.
+<img src="../images/prana-air/HA-Entities.png" alt="Home Assistant Entities" class="content-image" loading="lazy">
+</p>
+
+<p>
+The physical box still does its job, but the data hits my local network first. I get to trigger automations, keep my history locally, and decide if and when anything gets forwarded outward.
+</p>
+
+<div class="card">
+<strong>The device works the way it always did, but you call the shots.</strong>
+<br>What used to be a closed cloud gadget is now just another fast, local sensor on my own dashboard.
+</div>
+
+<h2>Why Privacy Matters Here</h2>
+
+<div class="card">
+<strong>Local first doesn't mean you can never use the cloud.</strong>
+<br>The important part is having a choice. Your home telemetry should live in your home unless you explicitly decide to share it elsewhere.
+</div>
+
+<h2>What I Want to Look at Next</h2>
+
+<div class="card">
+<p>
+Getting the data into Home Assistant was a fun win, but it naturally makes you wonder what else you can do with the hardware.
+</p>
+
+<p>
+My next goal is to pull the firmware off the ESP32-C3 chip, poke around to see how it handles the physical sensors internally, and figure out if I can replace the stock software with a clean <strong>ESPHome</strong> build.
+</p>
+
+<p>
+If that works out, I can turn this locked-down meter into something I completely own down to the bare metal.
+</p>
+
+<p>
+That is the next rabbit hole.
+</p>
+</div>
+
+<h2>Final Thoughts</h2>
+
+<p>
+This whole thing started because I wanted to know where my air quality meter was dumping its packets. 
+</p>
+<p>
+The fun part wasn't just finding the URL. It was realizing the device already had an open HTTP interface sitting there, just waiting for someone to point it in the right direction.
+</p>
+
+<a class="button" href="https://github.com/dreadedlama/Prana-Air" target="_blank" rel="noopener">⭐ View on GitHub</a>
+
+</main>
+
+<footer>
+Built with a DNS rewrite and an active hostility toward devices that refuse to work offline.<br>
+© 2026 dreadedlama
+</footer>
+
+<script>
+const toggle = document.querySelector('.menu-toggle');
+const nav = document.querySelector('.nav-links');
+toggle.addEventListener('click', () => nav.classList.toggle('show'));
+</script>
+
+</body>
+</html>
