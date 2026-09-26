@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacking the Atomberg SL1 Pro: From App Annoyance to Local Home Assistant Freedom | dreadedlama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,sans-serif;background:#09090B;color:#F5F5F5;line-height:1.8}
+header{padding:80px 8%;background:linear-gradient(180deg,#111827,#09090B)}
+.container{max-width:950px;margin:auto;padding:0 24px}
+main{max-width:950px;margin:auto;padding:60px 24px}
+h1{font-size:3.2rem;line-height:1.1;margin-bottom:16px}
+h2{margin:60px 0 18px;font-size:2rem}
+h3{margin-bottom:8px}
+p,li{color:#d4d4d8}
+p {margin-bottom: 16px;}
+.subtitle{color:#a1a1aa;font-size:1.2rem;max-width:720px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin:30px 0}
+.badge{background:#18181B;border:1px solid #303030;padding:8px 14px;border-radius:999px;font-size:0.9rem;}
+.card{background:#18181B;border:1px solid #2d2d2d;border-radius:16px;padding:22px;margin:20px 0}
+.timeline{border-left:2px solid #333;padding-left:24px;margin-top: 30px;}
+.step{margin-bottom:40px; position: relative;}
+.step::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: #38BDF8;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+pre{background:#0d1117;padding:20px;border-radius:12px;font-family:"JetBrains Mono",monospace;overflow:auto; border:1px solid #2d2d2d;}
+.card pre {margin: 16px 0; font-size: 0.9rem;}
+.button{display:inline-block;background:#38BDF8;color:#000;text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:700;margin-top:18px; transition: transform 0.2s, background 0.2s;}
+.button:hover{background:#7dd3fc; transform: translateY(-2px);}
+a{color:#38BDF8}
+footer{text-align:center;color:#888;border-top:1px solid #222;padding:30px;margin-top:70px}
+ul{padding-left:22px; margin-bottom: 16px;}
+table {width: 100%; border-collapse: collapse; margin-top: 16px; background: #111; border-radius: 8px; overflow: hidden; font-family:"JetBrains Mono",monospace; font-size: 0.9rem;}
+th, td {padding: 12px 16px; text-align: left; border-bottom: 1px solid #222;}
+th {background: #18181B; color: #fff; font-family:Inter,sans-serif;}
+
+/* ---------- IMAGES ---------- */
+.content-image {
+    max-width: 80%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #333;
+    margin: 24px auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: block;
+}
+.site-image {
+    max-width: 110%;
+    width: 110%;
+}
+
+.image-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start; /* Prevents height stretching across items */
+    gap: 16px;
+    margin: 24px 0;
+    width: 95%;
+}
+
+.image-row .content-image {
+    flex: 0 0 50%;
+    max-width: 50%;
+    height: auto;
+    align-self: flex-start; /* Preserves natural element height */
+    object-fit: contain;
+    margin: 0;
+}
+nav{
+position:sticky;
+top:0;
+z-index:100;
+background:rgba(9,9,11,.85);
+backdrop-filter:blur(16px);
+border-bottom:1px solid #222;
+}
+
+.navbar{
+max-width:1200px;
+margin:auto;
+padding:18px 24px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+display:flex;
+flex-direction:column;
+text-decoration:none;
+color:#fff;
+}
+
+.logo strong{
+font-size:18px;
+}
+
+.logo span{
+font-size:12px;
+color:#a1a1aa;
+letter-spacing:2px;
+text-transform:uppercase;
+margin-top:2px;
+}
+
+.nav-links{
+display:flex;
+gap:28px;
+list-style:none;
+margin-bottom: 0;
+}
+
+.nav-links a{
+text-decoration:none;
+color:#a1a1aa;
+transition:.25s;
+}
+
+.nav-links a:hover{
+color:#38BDF8;
+}
+
+.menu-toggle{
+display:none;
+background:none;
+border:none;
+color:#fff;
+font-size:28px;
+cursor:pointer;
+}
+
+@media(max-width:850px){
+.menu-toggle{
+display:block;
+}
+.navbar{
+flex-wrap:wrap;
+}
+.nav-links{
+display:none;
+flex-direction:column;
+width:100%;
+padding-top:16px;
+gap:16px;
+}
+.nav-links.show{
+display:flex;
+}
+/* Make sure all image rows scale cleanly on mobile */
+.image-row {
+    gap: 8px;
+    align-items: flex-start;
+}
+.image-row .content-image {
+    flex: 0 0 50%;
+    max-width: 50%;
+    height: auto;
+    align-self: flex-start;
+}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="navbar">
+<a href="../index.html" class="logo">
+<strong>Pushpender Yadav</strong>
+<span>dreadedlama</span>
+</a>
+<button class="menu-toggle" aria-label="Menu">&#9776;</button>
+<ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="https://github.com/dreadedlama" target="_blank" rel="noopener">GitHub</a></li>
+</ul>
+</div>
+</nav>
+
+<header>
+<div class="container">
+<h1>Hacking the Atomberg Lock: From App Annoyance to Local Freedom</h1>
+<p class="subtitle">
+How I got fed up with vendor app lock-in, reversed the Bluetooth protocol, tracked down the secret keys, and built a custom Home Assistant integration that actually respects my smart home.
+</p>
+<p class="hero-meta">Published on <time datetime="2026-09-27">27 September 2026</time></p>
+
+<div class="badges">
+<span class="badge">Reverse Engineering</span>
+<span class="badge">Bluetooth Low Energy</span>
+<span class="badge">Home Assistant</span>
+<span class="badge">Frida Adventures</span>
+<span class="badge">Smart Home</span>
+</div>
+
+<a class="button" href="https://github.com/dreadedlama/atomberg-lock" target="_blank" rel="noopener">⭐ View on GitHub</a>
+</div>
+</header>
+
+<main>
+
+<h2>The Annoyance That Started It All</h2>
+
+<p>
+I bought the Atomberg SL1 Pro smart door lock expecting a modern, hassle-free way to secure my front door. As a piece of physical hardware, it is actually impressive, and it gives you a bunch of ways to get inside: mobile app, fingerprint sensor, keypad, NFC cards and physical keys.
+</p>
+<div class="image-row">
+    <img src="../images/atomberg-lock/Atomberg-lock-front.jpg" alt="Atomberg Lock Front" class="content-image" loading="lazy">
+    <img src="../images/atomberg-lock/Atomberg-lock-back.jpg" alt="Atomberg Lock Back" class="content-image" loading="lazy">
+</div>
+
+<p>
+The software side was a completely different story.
+</p>
+
+<p>
+The moment I paired the lock with their official mobile app, the friction started immediately. Every single time I wanted to inspect battery levels, adjust user access, or check audit logs, the app insisted on having phone location toggled on. If location was off, it outright refused to discover or talk to the lock over Bluetooth. 
+</p>
+
+<p>
+Beyond the annoyance of permission prompts, the fundamental flaw was isolation. The lock was trapped in its own walled garden, completely severed from the central brain of my home: Home Assistant.
+</p>
+
+<div class="card">
+<strong>Stripping Away the Magic</strong>
+<br>Underneath all the companion app marketing, this is just a standard Bluetooth Low Energy peripheral listening for radio frames. If their smartphone app could tell the lock what to do over radio packets, Home Assistant could do the exact same thing locally.
+</div>
+
+<div class="card">
+<h3>The Goal</h3>
+<ul>
+<li>Eliminate the companion app and its mandatory location prompts.</li>
+<li>Control the lock directly from my local Home Assistant dashboard.</li>
+<li>Monitor battery percentage</li>
+<li>Capture audit logs to see who entered using which fingerprint, PIN, or NFC card.</li>
+<li>Make the solution reproducible so other users can set it up without root or hex editors.</li>
+</ul>
+</div>
+
+<h2>Peeling Back the Layers</h2>
+
+<p>
+Figuring out how this lock actually communicates was an entertaining journey full of cryptographic puzzles, timing quirks, and Android tinkering. Here is how the story unfolded.
+</p>
+
+<div class="timeline">
+
+<div class="step">
+<h3>Step 1: The App Teardown & The Secret Bootstrap Key</h3>
+<p>
+The obvious first stop was deobfuscating and decompiling the official Android APK to see how pairing worked.
+</p>
+<p>
+Buried in the crypto helper classes was a hardcoded 16-byte key:
+</p>
+<pre>mQ3cJOATdERLW1a5</pre>
+<p>
+It turned out this key is universal across every lock they make. It acts like a factory bootstrap password. When you pair a fresh lock with your phone for the very first time, the mobile app wraps its greeting message using this hardcoded key. The lock decrypts it, generates its own unique credentials, and hands them back to the phone.
+</p>
+</div>
+
+<div class="step">
+<h3>Step 2: Spying on Memory with Frida</h3>
+<p>
+Static code only tells you half the story; I wanted to see the actual conversations happening in real time. I fired up Frida on my rooted phone to hook right into Android native crypto methods while tapping around in the app.
+</p>
+<p>
+Watching the buffers fly past live in my terminal answered the cryptographic mystery:
+</p>
+<ul>
+<li><strong>The Encryption:</strong> Standard AES-128 in Electronic Codebook (ECB) mode with PKCS#7 padding. No initialization vectors, just clean 16-byte chunks.</li>
+<li><strong>The Static Master Key:</strong> During that very first handshake, the lock creates a unique 16-character ASCII key (for example: <code>AgABTwoGQslyXokl</code>). The lock writes this permanently into its internal flash memory. It stays identical across every daily unlock unless you physically reset the lock to factory defaults.</li>
+<li><strong>Dynamic Session Keys:</strong> Even though the Master Key is permanent, the lock does not let you reuse it for normal commands. On every single connection, the lock and phone negotiate a brand new, one-time 16-byte session key and a 4-byte session token. Every unlock command or battery check that follows has to use that ephemeral session key.</li>
+</ul>
+</div>
+
+<div class="step">
+<h3>Step 3: The Four-Step Dance</h3>
+<p>
+You cannot just wake up the lock and shout "open!" at it. The lock firmware is strict about its security lifecycle. Every single connection has to perform a four-step dance:
+</p>
+<ol>
+<li><strong>Probe (0x00F0):</strong> Encrypted with your Master Key. Proves who you are and grabs a 4-byte session token.</li>
+<li><strong>Key Request (0x00F1):</strong> Send back the token using the Master Key. The lock generates that session unique ephemeral key.</li>
+<li><strong>Context Sync (0x00F2):</strong> Send your unique Lock Salt encrypted with the new session key. The lock acknowledges you are authorized to issue commands.</li>
+<li><strong>Execute (0x0001):</strong> Now you can trigger the motor. The deadbolt pulls back, and the door opens.</li>
+</ol>
+<br>
+<p>
+Once I replicated this handshake in a Python script, the lock unlocked. The front door was officially mine.
+</p>
+</div>
+
+<div class="step">
+<h3>Step 4: Tracking Who Came Through the Door</h3>
+<p>
+While testing the vendor app, I noticed it could generate temporary single-use visitor passcodes. For that feature to work, the lock obviously needs a way to report which specific credential was used to open the door.
+</p>
+<p>
+That made me dig deeper into the Bluetooth captures, and I found a goldmine:
+</p>
+<ul>
+<li><strong>Live Push Alerts (Opcode 0x000A):</strong> Whenever someone touches the lock while connected, it immediately broadcasts an unsolicited notification packet containing the event, battery state, and credential details.</li>
+<li><strong>Flash Audit History (Opcode 0x0009):</strong> The lock actually stores an offline history log in its internal flash memory chip. Each event is a neat 32-byte record.</li>
+</ul>
+<p>
+Decoding these records revealed rich telemetry:
+</p>
+<table>
+<tr>
+  <th>Unlock Method</th>
+  <th>Raw Bytes Sent by Lock</th>
+  <th>What Shows in Home Assistant</th>
+</tr>
+<tr>
+  <td><strong>Fingerprint</strong></td>
+  <td><code>Event: 0x04</code><br><code>Type: 0x01</code><br><code>Slot: 0x0011 / 0x0014</code></td>
+  <td><em>Unlocked by - Left Thumb</em><br><em>Unlocked by - Right Thumb</em></td>
+</tr>
+<tr>
+  <td><strong>NFC Card</strong></td>
+  <td><code>Event: 0x04</code><br><code>Type: 0x04</code><br><code>Slot: 0x000D</code><br></td>
+  <td><em>Unlocked by - NFC Card 1</em></td>
+</tr>
+<tr>
+  <td><strong>Keypad PIN</strong></td>
+  <td><code>Event: 0x04</code><br><code>Type: 0x02</code><br><code>User: 0x03E9</code><br><code>ASCII: 31 32 33 34 35 36</code></td>
+  <td><em>Unlocked by - PIN: 123456</em></td>
+</tr>
+<tr>
+  <td><strong>Atomberg App</strong></td>
+  <td><code>Event: 0x04</code><br><code>Type: 0x00</code><br><code>Slot: 0</code><br></td>
+  <td><em>Unlocked by - Atomberg App</em></td>
+</tr>
+<tr>
+  <td><strong>Denied Attempt</strong></td>
+  <td><code>Event: 0x36</code><br><code>Type: 0x02</code> (Wrong PIN)<br><code>ASCII: 31 31 31 31 31 31</code></td>
+  <td><em>Alert: Wrong Keypad PIN: 111111</em></td>
+</tr>
+</table>
+</div>
+
+<div class="step">
+<h3>Step 5: Making It Frictionless for Everyone Else</h3>
+<p>
+I had achieved local control on my own machine, but relying on Frida hooks on a rooted Android device is not something normal smart home users want to deal with. If I wanted to open-source a Home Assistant integration, the credential extraction had to be accessible to anyone.
+</p>
+<p>
+The eureka moment came from remembering the lifecycle of that Static Master Key. Because it is generated fresh whenever the lock is paired, resetting the lock forces it to send that key over the air to the app, encrypted with the universal factory bootstrap key.
+</p>
+<p>
+The solution was clean:
+</p>
+<ol>
+<li>Turn on standard Bluetooth HCI Snooping in Android Developer Options (no root required).</li>
+<li>Reset the lock and pair it normally in the mobile app once.</li>
+<li>Pull the Bluetooth log file via ADB.</li>
+<li>Run a small helper script that automatically hunts down the initial handshake, decrypts it with the factory key, and prints the exact three values needed for Home Assistant.</li>
+</ol>
+<img src="../images/atomberg-lock/decrypted_credentails.png" alt="Decrypted Credentails" loading="lazy">
+<p>
+Those three values are all you need: your lock <strong>MAC Address</strong>, its permanent <strong>Static Master Key</strong>, and a 4-byte <strong>Lock Salt</strong>.
+</p>
+</div>
+<div class="step">
+<h3>Step 6: The BLE Fragmentation Trap</h3>
+<p>
+Extracting those keys from the Bluetooth log was not smooth sailing at first. My early scripts kept complaining that zero frames were found.
+</p>
+<p>
+The culprit was default Bluetooth Low Energy packet sizing. The lock operates on the standard 23-byte MTU limit, leaving only 20 bytes for actual payload per packet. When the lock replies with a 41-byte key exchange message, it cuts it across multiple transmissions: 20 bytes, then another 20 bytes, then a lonely 1-byte tail piece.
+</p>
+<p>
+If you search for 16-byte or 32-byte AES blocks without reassembling those fragments first, you are staring at broken ciphertext. Once I wrote a proper channel reassembler that stitched those 20-byte chunks back together, the decryption script popped the Master Key out instantly.
+</p>
+</div>
+</div>
+
+<h2>The Anatomy of an HSJ Packet</h2>
+
+<p>
+Every single message flying back and forth over the air is wrapped in a tidy binary envelope:
+</p>
+
+<pre>
++---------------+----------------+----------------+--------------------------+---------------+
+| Header (3B)   | Total Len (2B) | Outer Seq (2B) | Encrypted Payload (NB)   | Checksum (2B) |
++---------------+----------------+----------------+--------------------------+---------------+
+| 0x48 0x53 0x4A| Big-Endian     | Big-Endian     | AES-128-ECB Ciphertext   | Modbus CRC-16 |
+|    ("HSJ")    | uint16         | uint16         | (Multiple of 16 Bytes)   | Big-Endian    |
++---------------+----------------+----------------+--------------------------+---------------+
+</pre>
+
+<p>
+It starts with the magic ASCII characters <code>HSJ</code>, specifies the total length of the frame, tracks a rolling sequence number, holds the padded AES ciphertext, and caps it off with a standard Modbus CRC-16 checksum.
+</p>
+
+<p>
+Whenever a packet is longer than 20 bytes, the sender simply slices it into 20-byte pieces with a brief 30ms breather between chunks so the Bluetooth radio buffer does not overflow.
+</p>
+
+<h2>Living Locally in Home Assistant</h2>
+
+<p>
+With the protocol completely mapped out, I built a custom Home Assistant integration (<code>atomberg_lock</code>) to manage the entire lifecycle. The hardware also enforces a strict <strong>single-connection limit</strong>.
+</p>
+
+<p>
+The integration handles this with an efficient connection queue:
+</p>
+
+<pre>
+┌────────────────────────────────────────────────────────────┐
+│                    HOME ASSISTANT CORE                     │
+│                                                            │
+│  Entities Exposed:                                         │
+│  - lock.atomberg_sl1_pro_door (Unlock with 5s auto-relock) │
+│  - sensor.atomberg_battery (Live percentage tracking)      │
+│  - sensor.atomberg_last_event (Push alerts & timestamps)   │
+│  - sensor.atomberg_user (Decoded name based on slot ID)    │
+│  - sensor.atomberg_keypad_pin (Diagnostic entered PIN)     │
+│  - text.atomberg_slot_mappings_json (Editable names)       │
+│  - button.get_battery                                      │
+│  - button.fetch_logs                                       │
+└────────────────────────────────────────────────────────────┘
+</pre>
+
+<p>
+Whenever an unlock is requested, the coordinator connects, executes the 4-step handshake, triggers the deadbolt, starts a 5-second auto-relock timer to reflect the physical latch behavior, and drops the Bluetooth link cleanly.
+</p>
+
+<h2>The End Result</h2>
+
+<p>
+The lock now lives completely inside Home Assistant as a first-class citizen, operating over pure local Bluetooth Low Energy without needing the official app or an internet connection.
+</p>
+
+<div class="image-row">
+    <img src="../images/atomberg-lock/entities-1.png" alt="Atomberg Lock Entities Overview" class="content-image" loading="lazy">
+    <img src="../images/atomberg-lock/entities-2.png" alt="Atomberg Lock Detailed Entities" class="content-image" loading="lazy">
+</div>
+
+<p>
+I get live battery readouts, and granular audit trail sensors that immediately parse which user opened the door.
+</p>
+
+<div class="card">
+<strong>No more permission nags, no vendor lock-in.</strong>
+<br>The hardware behaves exactly as a smart home device should: responsive, private, and fully integrated into my local automations.
+</div>
+
+<h2>What I Want to Look at Next</h2>
+
+<div class="card">
+<p>
+Having local control and access logs inside Home Assistant opens the door to far more contextual automations than just unlocking deadbolts.
+</p>
+
+<p>
+Because the lock decodes individual credential slots (identifying whose fingerprint or card just touched the sensor), my next plan is to tie this directly into whole-home arrival automations:
+</p>
+
+<ul>
+<li><strong>Personalized Welcome Announcements:</strong> Trigger smart speaker TTS announcements like <em>"Welcome home, Pushpender"</em> the instant my fingerprint verifies.</li>
+<li><strong>Contextual Evening Routines:</strong> Disarm alarm modes, spin up specific entry lights, and set climate control based on who unlocked the door after sunset.</li>
+<li><strong>Security & Tamper Alerts:</strong> Push immediate high-priority snapshot notifications if multiple wrong PINs or unknown NFC tags are registered on the keypad.</li>
+</ul>
+
+<p>
+Treating the front door as an identity sensor turns the lock into an active trigger for the entire house.
+</p>
+</div>
+
+<h2>Final Thoughts</h2>
+
+<p>
+What started as annoyance over location permission nag screens turned into a complete reverse engineering adventure.
+</p>
+<p>
+Now, my front door lock operates 100% locally. The deadbolt unlocks instantly from my dashboard, and every single entry log is archived privately on my own server without a single byte leaving the house.
+</p>
+<p>
+Smart devices in your home should answer to you, not to a vendor cloud app. If you are willing to look at the packets, you can usually take back control.
+</p>
+
+<a class="button" href="https://github.com/dreadedlama/atomberg-lock" target="_blank" rel="noopener">⭐ View on GitHub</a>
+
+</main>
+
+<footer>
+Built with a Bluetooth adapter and an active hostility toward closed IoT ecosystems.<br>
+© 2026 dreadedlama
+</footer>
+
+<script>
+const toggle = document.querySelector('.menu-toggle');
+const nav = document.querySelector('.nav-links');
+toggle.addEventListener('click', () => nav.classList.toggle('show'));
+</script>
+
+</body>
+</html>

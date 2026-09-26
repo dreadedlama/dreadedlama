@@ -271,7 +271,7 @@ Getting this to work took some trial and error. I didn't magically know what to 
 <div class="timeline">
 
 <div class="step">
-<h3>📦 Step 1: Finding the Meter on My Network</h3>
+<h3>Step 1: Finding the Meter on My Network</h3>
 <p>
 First, I needed to know where the thing even was. I logged into my router and checked the DHCP leases to see what new hardware had joined recently. Sure enough, an ESP32 chip popped up:
 </p>
@@ -291,7 +291,7 @@ DHCPACK(br-lan) 192.168.X.XXX AQI-Meter-esp32c3
 </div>
 
 <div class="step">
-<h3>☁️ Step 2: Watching Where It Sent Data</h3>
+<h3>Step 2: Watching Where It Sent Data</h3>
 <p>
 Once I had its IP address, I watched its outbound DNS and traffic requests. It kept trying to talk to one specific address over and over:
 </p>
@@ -302,7 +302,7 @@ Finding that URL was huge. It meant I didn't have to touch the device firmware y
 </div>
 
 <div class="step">
-<h3>🌐 Step 3: Hijacking the Domain with AdGuard</h3>
+<h3>Step 3: Hijacking the Domain with AdGuard</h3>
 <p>
 Since I already use AdGuard Home on my network for DNS, setting up an intercept was pretty easy. I added a custom local DNS rewrite rule:
 </p>
@@ -313,7 +313,7 @@ Now, whenever the meter thinks it is calling home to <code>data.aqi.in</code>, A
 </div>
 
 <div class="step">
-<h3>🔄 Step 4: Fixing Port Mismatches with Nginx</h3>
+<h3>Step 4: Fixing Port Mismatches with Nginx</h3>
 <p>
 I hit a quick snag once the traffic arrived at my server. The meter's code assumes it is talking to standard port 80, but my Home Assistant instance hangs out on port 8123. 
 </p>
@@ -340,7 +340,7 @@ Using an exact match on that specific URL means anything else hitting port 80 ge
 </div>
 
 <div class="step">
-<h3>📡 Step 5: Looking Inside the Request Body</h3>
+<h3>Step 5: Looking Inside the Request Body</h3>
 <p>
 With Nginx passing the traffic through, I could finally see what the meter was saying. I checked the logs and found a standard form post:
 </p>
@@ -362,7 +362,7 @@ This was a relief. It wasn't encrypted or locked behind some weird proprietary b
 </div>
 
 <div class="step">
-<h3>🔌 Step 6: Catching It in Home Assistant</h3>
+<h3>Step 6: Catching It in Home Assistant</h3>
 <p>
 The final coding piece was setting up a custom webhook endpoint inside Home Assistant matching the path:
 </p>
