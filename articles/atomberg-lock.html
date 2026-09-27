@@ -374,18 +374,6 @@ The solution was clean:
 Those three values are all you need: your lock <strong>MAC Address</strong>, its permanent <strong>Static Master Key</strong>, and a 4-byte <strong>Lock Salt</strong>.
 </p>
 </div>
-<div class="step">
-<h3>Step 6: The BLE Fragmentation Trap</h3>
-<p>
-Extracting those keys from the Bluetooth log was not smooth sailing at first. My early scripts kept complaining that zero frames were found.
-</p>
-<p>
-The culprit was default Bluetooth Low Energy packet sizing. The lock operates on the standard 23-byte MTU limit, leaving only 20 bytes for actual payload per packet. When the lock replies with a 41-byte key exchange message, it cuts it across multiple transmissions: 20 bytes, then another 20 bytes, then a lonely 1-byte tail piece.
-</p>
-<p>
-If you search for 16-byte or 32-byte AES blocks without reassembling those fragments first, you are staring at broken ciphertext. Once I wrote a proper channel reassembler that stitched those 20-byte chunks back together, the decryption script popped the Master Key out instantly.
-</p>
-</div>
 </div>
 
 <h2>The Anatomy of an HSJ Packet</h2>
